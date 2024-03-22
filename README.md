@@ -1,1 +1,1 @@
-# ai_chatbot
+# django_chat
