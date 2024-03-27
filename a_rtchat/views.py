@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from .models import *
 from .forms import ChatmessageCreateForm
+from sel import get_data
 
 import os
 from llamaapi import LlamaAPI
@@ -32,13 +33,18 @@ def chat_view(request):
 
             llama = LlamaAPI(llama_api_key)
 
+            # msg.append(message.body)
+            try:
+                data = get_data(message.body)
+            except:
+                print("error")
+
             # Build the API request
             api_request_json = {
                 "messages": [
                     {"role": "user", "content": message.body},
                 ],
                 "stream": False,
-                "function_call": "get_current_weather",
             }
 
             # Execute the Request
@@ -61,6 +67,10 @@ def chat_view(request):
                 'message2': message2,
                 'user2': User.objects.get(username="botty")
             }
+
+            # write the message2 to the txt file
+            with open("./data/data.txt", "a") as file:
+                file.write(f"{message2.body}\n")
 
             return render(request, 'a_rtchat/partials/chat_messages_p.html', context)
 
