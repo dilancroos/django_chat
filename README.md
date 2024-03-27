@@ -128,8 +128,11 @@ Python 3.11.6^
 <br>
 - Create user "botty" by,
     - logging in to [https://127.0.0.1:8000/admin](https://127.0.0.1:8000/admin) > Users > ADD USER +
+
     - Add an email address
+
     - Select ```Staff status``` & ```Superuser status``` > save
+    
     - Profiles > botty > Choose File --> select file on ./media/avatars/botty.png
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
