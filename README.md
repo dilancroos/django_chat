@@ -128,7 +128,7 @@ Python 3.11.6^
 <br>
 - Create user "botty" by,
 
-    - logging in to [https://127.0.0.1:8000/admin](https://127.0.0.1:8000/admin) > Users > ADD USER +
+    - logging in to https://127.0.0.1:8000/admin > Users > ADD USER +
 
     - Add an email address
 
