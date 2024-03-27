@@ -104,6 +104,13 @@ Python 3.11.6^
     $ pip install -r requirements.txt
   ```
 
+- Rename envtemp to .env
+<br/>
+
+- Add your Llama Api key to .env file
+    - If you dont have one visit [llama-api.com](https://console.llama-api.com/account/api-token) to creat an API key
+<br>
+
 - Run Server
 
   ```sh
@@ -113,10 +120,17 @@ Python 3.11.6^
 - Chat
 
     [https://127.0.0.1:8000](https://127.0.0.1:8000)
+    <br>
 
-- Credentials
-    User: admin@email.com
+- Credentials <br>
+    User: admin@email.com <br>
     Password: 1zaq2xsw3cde
+<br>
+- Create user "botty" by,
+    - logging in to [https://127.0.0.1:8000/admin](https://127.0.0.1:8000/admin) > Users > ADD USER +
+    - Add an email address
+    - Select ```Staff status``` & ```Superuser status``` > save
+    - Profiles > botty > Choose File --> select file on ./media/avatars/botty.png
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
