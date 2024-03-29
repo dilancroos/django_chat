@@ -111,6 +111,26 @@ Python 3.11.6^
     - If you dont have one visit [llama-api.com](https://console.llama-api.com/account/api-token) to creat an API key
 <br>
 
+- Migrate DB
+  ```sh
+  $ python manage.py migrate
+  ```
+  ```sh
+  $ python manage.py makemigrations
+  ```
+  again
+  ```sh
+  $ python manage.py migrate
+  ```
+
+- Create Super User
+  ```sh
+  $ python manage.py createsuperuser
+  ```
+  - enter username, email, password
+  
+
+
 - Run Server
 
   ```sh
@@ -122,9 +142,6 @@ Python 3.11.6^
     [https://127.0.0.1:8000](https://127.0.0.1:8000)
     <br>
 
-- Credentials <br>
-    User: admin@email.com <br>
-    Password: 1zaq2xsw3cde
 <br>
 - Create user "botty" by,
 
