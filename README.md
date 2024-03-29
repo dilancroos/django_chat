@@ -128,8 +128,6 @@ Python 3.11.6^
   $ python manage.py createsuperuser
   ```
   - enter username, email, password
-  
-
 
 - Run Server
 
@@ -143,13 +141,21 @@ Python 3.11.6^
     <br>
 
 <br>
-- Create user "botty" by,
+- Login to Admin Portal,
 
-    - logging in to https://127.0.0.1:8000/admin > Users > ADD USER +
+  - logging in to https://127.0.0.1:8000/admin using the credentials you created.
+
+  - Create chat group,
+
+    - Click on Chat groups > ADD CHAT GROUPS + > create a chat group called "ai-chat".
+
+  - Create user "botty" by,
+
+    - Click on Users > ADD USER + > create a user named "botty"
 
     - Add an email address
 
-    - Select ```Staff status``` & ```Superuser status``` > save
+    - Save
 
     - Profiles > botty > Choose File --> select file on ./media/avatars/botty.png
 
@@ -169,7 +175,7 @@ Project Link: [https://github.com/dilancroos/django_chat](https://github.com/dil
 
 ## Acknowledgments
 
--
+- Django chat template by [Andreas Jud](https://www.youtube.com/@ajudmeister)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
