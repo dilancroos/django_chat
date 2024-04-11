@@ -44,7 +44,7 @@ langsmith==0.1.33
 llama-index==0.10.23
 llama-index-agent-openai==0.1.7
 llama-index-cli==0.1.11
-llama-index-core==0.10.23.post1
+llama-index-core==0.10.24
 llama-index-embeddings-openai==0.1.7
 llama-index-indices-managed-llama-cloud==0.1.5
 llama-index-legacy==0.9.48
