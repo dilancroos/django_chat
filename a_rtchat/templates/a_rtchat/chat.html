@@ -1,33 +1,41 @@
 {% extends 'layouts/blank.html' %} {% block content %}
 
-<wrapper class="block max-w-2xl mx-auto my-10 px-6">
+<wrapper class="block max-w-3xl mx-auto my-8 px-4 sm:px-6">
   <div
     id="chat_window"
-    class="h-[45rem] flex flex-col bg-gray-800 rounded-2xl shadow-2xl relative p-1"
+    class="h-[calc(100vh-8.5rem)] min-h-[36rem] max-h-[48rem] flex flex-col overflow-hidden rounded-2xl bg-slate-900 shadow-2xl shadow-slate-950/20 ring-1 ring-slate-800"
   >
     <div
-      class="flex justify-center text-emerald-400 bg-gray-800 p-2 sticky top-0 z-10"
+      class="flex items-center justify-between border-b border-slate-800 bg-slate-950/80 px-5 py-3 text-sm"
     >
-      <span id="online-count" class="pr-1"></span>online
+      <div>
+        <p class="mb-0 text-xs font-semibold uppercase tracking-wider text-slate-500">Local RAG</p>
+        <p class="mb-0 text-sm font-medium text-slate-100">Knowledge chat</p>
+      </div>
+      <span class="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-300">
+        <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+        <span id="online-count"></span>online
+      </span>
     </div>
-    <div id="chat_container" class="overflow-y-auto grow">
-      <ul id="chat_messages" class="flex flex-col justify-end gap-2 p-4">
+    <div id="chat_container" class="grow overflow-x-hidden overflow-y-auto px-4 py-5 sm:px-5">
+      <ul id="chat_messages" class="flex min-h-full flex-col justify-end gap-5">
         {% for message in chat_messages reversed %} 
           {% include 'a_rtchat/chat_message.html' %}
         {% endfor %}
       </ul>
     </div>
-    <div class="sticky bottom-0 z-10 p-2 bg-gray-800">
-      <div class="flex items-center rounded-xl px-2 py-2">
-        <form id="chat_message_form" class="w-full"
+    <div class="border-t border-slate-800 bg-slate-950/90 p-4">
+        <form id="chat_message_form" class="flex w-full flex-col gap-3 sm:flex-row sm:items-end"
+        method="post"
+        action="{% url 'home' %}"
         hx-post="{% url 'home' %}"
         hx-target="#chat_messages"
         hx-swap="beforeend"
         _="on htmx:afterRequest reset() me" >
           {% csrf_token %}
-          {{ form }}
+          {{ form.body }}
+          <button type="submit" class="!h-[3.25rem] w-full shrink-0 !rounded-xl !bg-emerald-500 !px-5 !py-0 text-sm font-semibold !shadow-none transition hover:!bg-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-300 focus:ring-offset-2 focus:ring-offset-slate-950 active:scale-[0.98] sm:w-auto">Send</button>
         </form>
-      </div>
     </div>
   </div>
 </wrapper>
@@ -40,12 +48,11 @@
     const container = document.getElementById('chat_container');
     container.scrollTop = container.scrollHeight;
   }
+  const messageInput = document.getElementById('id_body');
+  if (messageInput) {
+    messageInput.value = '';
+  }
   scrollToBottom()
 
 </script>
-{% endblock %}
-
-<!-- reload page every 5 seconds -->
-{% block meta %}
-<meta http-equiv="refresh" content="5">
 {% endblock %}

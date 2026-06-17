@@ -7,8 +7,8 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <h2 align="center">Django Chat with LLAMA</h2>
-  <h5 align="center">Université Paris Cité - M2 - Digital Science (AIRE)</h5>
+    <h2 align="center">Django Local RAG Chat</h2>
+    <h5 align="center">Université Paris Cité - M2 - Digital Science (AIRE)</h5>
 
   <p align="center">
     Dilan Croos
@@ -27,14 +27,16 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
-    <li><a href="#usage">Usage</a></li>
+    <li><a href="#about-the-project">About The Project</a></li>
+    <li><a href="#getting-started">Getting Started</a></li>
+    <ul>
+        <li><a href="#requirements">Requirements</a></li>
+        <li><a href="#setup">Setup</a></li>
+        <li><a href="#knowledge-base">Knowledge Base</a></li>
+        <li><a href="#run">Run</a></li>
+        <li><a href="#configuration">Configuration</a></li>
+        <li><a href="#tests">Tests</a></li>
+    </ul>
     <li><a href="#contact">Contact</a></li>
     <li><a href="#acknowledgments">Acknowledgments</a></li>
   </ol>
@@ -44,7 +46,11 @@
 
 ## About the Project
 
-
+A local Django chat app that answers questions from files you place in a local
+knowledge-base folder. Source files are converted to Markdown with Microsoft's
+MarkItDown first, then the app indexes only the generated Markdown files. The
+app uses Ollama for local chat and embedding models, so it does not need a paid
+LLM API after installation.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -54,112 +60,130 @@
 
 To get a local copy up and running follow these simple steps.
 
-### Prerequisites
+## Requirements
 
-Python 3.11.6^
+- Python 3.11 or newer
+- Ollama running locally
 
-- install pip
+Install Ollama from <https://ollama.com/download>, then pull the default models:
 
-  ```sh
-    $ python3 -m pip install pip
-  ```
+```sh
+ollama pull llama3.2
+ollama pull nomic-embed-text
+```
 
-### Installation
+## Setup
 
-1. Clone the repo
+Clone the repo
 
-   ```sh
-    $ git clone git@github.com:dilancroos/django_chat.git
-   ```
+```sh
+ git clone git@github.com:dilancroos/django_chat.git
+ cd django_chat
+```
 
-2. Change to the working directory
+Create and activate a virtual environment:
 
-   ```sh
-    $ cd django_chat
-   ```
+```sh
+python3 -m venv .venv
+source .venv/bin/activate
+```
 
-- Check <a href="#usage">Usage</a> to create a virtual environment
+Install dependencies:
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+```sh
+pip install -r requirements.txt
+```
 
-<!-- USAGE EXAMPLES -->
+Create an environment file:
 
-## Usage
+```sh
+cp envtemp .env
+```
 
-- Create a virtual environment .venv
+Run the database migrations and create a user:
 
-  ```sh
-    $ python3 -m venv .venv
-  ```
+```sh
+python manage.py migrate
+python manage.py makemigrations
+```
 
-- Enter the virtual environment .venv
+again
 
-  ```sh
-    $ source .venv/bin/activate
-  ```
+```sh
+python manage.py migrate
+```
 
-- Install PIP packages
+```sh
+python manage.py createsuperuser
+```
 
-  ```sh
-    $ pip install -r requirements.txt
-  ```
+## Knowledge Base
 
-- Rename envtemp to .env
-<br/>
+Put source files in `knowledge_base/`. The app converts them into Markdown in
+`knowledge_markdown/`, then indexes only those generated `.md` files.
 
-- Add your Llama Api key to .env file
-    - If you dont have one visit [llama-api.com](https://console.llama-api.com/account/api-token) to creat an API key
-<br>
+Supported first-version source file types are:
 
-- Migrate DB
-  ```sh
-  $ python manage.py migrate
-  ```
-  ```sh
-  $ python manage.py makemigrations
-  ```
-  again
-  ```sh
-  $ python manage.py migrate
-  ```
+- PDF
+- Word
+- PowerPoint
+- XLS and XLSX
+- CSV
+- Markdown
+- TXT
+- HTML
+- JSON and XML
+- ZIP
 
-- Create Super User
-  ```sh
-  $ python manage.py createsuperuser
-  ```
-  - enter username, email, password
+The app checks this folder when you send a chat message. If files changed, it
+converts the files into Markdown, then rebuilds the local index in
+`rag_storage/` before answering.
 
-- Run Server
+You can rebuild the index manually:
 
-  ```sh
-    $ python manage.py runserver
-  ```
+```sh
+python manage.py rebuild_rag_index
+```
 
-- Chat
+To skip rebuilding when the stored manifest is current:
 
-    [https://127.0.0.1:8000](https://127.0.0.1:8000)
-    <br>
+```sh
+python manage.py rebuild_rag_index --skip-unchanged
+```
 
-<br>
-- Login to Admin Portal,
+## Run
 
-  - logging in to https://127.0.0.1:8000/admin using the credentials you created.
+Start Ollama, then start Django:
 
-  - Create chat group,
+```sh
+python manage.py runserver
+```
 
-    - Click on Chat groups > ADD CHAT GROUPS + > create a chat group called "ai-chat".
+Open <http://127.0.0.1:8000>, sign in, and ask questions about the files in
+`knowledge_base/`. Do not edit `knowledge_markdown/` manually; it is generated
+from the source folder.
 
-  - Create user "botty" by,
+The app automatically creates the `ai-chat` chat group and `botty` bot user the
+first time a chat message is sent.
 
-    - Click on Users > ADD USER + > create a user named "botty"
+## Configuration
 
-    - Add an email address
+These settings can be changed in `.env`:
 
-    - Save
+```sh
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_CHAT_MODEL=llama3.2
+OLLAMA_EMBED_MODEL=nomic-embed-text
+RAG_SOURCE_DIR=knowledge_base
+RAG_MARKDOWN_DIR=knowledge_markdown
+RAG_STORAGE_DIR=rag_storage
+```
 
-    - Profiles > botty > Choose File --> select file on ./media/avatars/botty.png
+## Tests
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+```sh
+python manage.py test
+```
 
 <!-- CONTACT -->
 

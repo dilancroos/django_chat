@@ -1,1 +1,7 @@
-LLAMA_API_KEY = <<Your API Key Here>>
+DJANGO_SECRET_KEY=django-insecure-local-dev-key-change-me
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_CHAT_MODEL=llama3.2
+OLLAMA_EMBED_MODEL=nomic-embed-text
+RAG_SOURCE_DIR=knowledge_base
+RAG_MARKDOWN_DIR=knowledge_markdown
+RAG_STORAGE_DIR=rag_storage
