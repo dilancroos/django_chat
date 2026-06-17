@@ -189,7 +189,7 @@ python manage.py test
 
 ## Contact
 
-Dilan Croos - antondilan.crooswarnakulasuriya@cri-paris.org.com
+Dilan Croos - mail@dilancroos.com
 
 Project Link: [https://github.com/dilancroos/django_chat](https://github.com/dilancroos/django_chat)
 
