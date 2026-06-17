@@ -1,77 +1,83 @@
-from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from .models import *
+from django.contrib.auth.models import User
+from django.shortcuts import redirect, render
+
 from .forms import ChatmessageCreateForm
-from sel import get_data
+from .models import ChatGroup, GroupMessage
+from .rag import KnowledgeBaseEmpty, LocalRag, LocalRagConfigurationError, LocalRagError
 
-import os
-from llamaapi import LlamaAPI
-from dotenv import load_dotenv
 
-load_dotenv()
+CHAT_GROUP_NAME = "ai-chat"
+BOT_USERNAME = "botty"
 
 
 @login_required
 def chat_view(request):
-    chat_group = get_object_or_404(ChatGroup, group_name="ai-chat")
+    chat_group = _get_chat_group()
     chat_messages = chat_group.chat_messages.all()[:30]
     form = ChatmessageCreateForm()
 
-    # context = {}
-
-    if request.htmx:
+    if request.method == "POST":
         form = ChatmessageCreateForm(request.POST)
-        if form.is_valid:
+        if form.is_valid():
             message = form.save(commit=False)
             message.author = request.user
             message.group = chat_group
             message.save()
 
-            # Initialize the SDK
-            # get the key from the .env file
-            llama_api_key = os.getenv("LLAMA_API_KEY")
-
-            llama = LlamaAPI(llama_api_key)
-
-            # msg.append(message.body)
-            try:
-                data = get_data(message.body)
-            except:
-                print("error")
-
-            # Build the API request
-            api_request_json = {
-                "messages": [
-                    {"role": "user", "content": message.body},
-                ],
-                "stream": False,
-            }
-
-            # Execute the Request
-            response = llama.run(api_request_json)
-
-            # get the response
-            response = llama.run(api_request_json).json()[
-                "choices"][0]["message"]["content"]
-            print(response)
-
-            # initialize the message
-            message2 = GroupMessage()
-            message2.body = response
-            message2.author = User.objects.get(username="botty")
-            message2.group = chat_group
-            message2.save()
+            message2 = _create_bot_message(chat_group, message.body)
             context = {
-                'message': message,
-                'user': request.user,
-                'message2': message2,
-                'user2': User.objects.get(username="botty")
+                "message": message,
+                "message2": message2,
+                "user": request.user,
             }
+            if request.htmx:
+                return render(request, "a_rtchat/partials/chat_messages_p.html", context)
+            return redirect("home")
 
-            # write the message2 to the txt file
-            with open("./data/data.txt", "a") as file:
-                file.write(f"{message2.body}\n")
+    return render(request, "a_rtchat/chat.html", {"chat_messages": chat_messages, "form": form})
 
-            return render(request, 'a_rtchat/partials/chat_messages_p.html', context)
 
-    return render(request, 'a_rtchat/chat.html', {'chat_messages': chat_messages, 'form': form})
+def _get_chat_group() -> ChatGroup:
+    chat_group, _created = ChatGroup.objects.get_or_create(group_name=CHAT_GROUP_NAME)
+    return chat_group
+
+
+def _get_bot_user() -> User:
+    bot_user, created = User.objects.get_or_create(
+        username=BOT_USERNAME,
+        defaults={"email": "botty@example.local", "is_active": False},
+    )
+    if created:
+        bot_user.set_unusable_password()
+        bot_user.save(update_fields=["password"])
+    return bot_user
+
+
+def _create_bot_message(chat_group: ChatGroup, question: str) -> GroupMessage:
+    body = _answer_question(question)
+    return GroupMessage.objects.create(
+        body=body,
+        author=_get_bot_user(),
+        group=chat_group,
+    )
+
+
+def _answer_question(question: str) -> str:
+    try:
+        answer = LocalRag.from_settings().answer(question)
+    except KnowledgeBaseEmpty as exc:
+        return str(exc)
+    except LocalRagConfigurationError as exc:
+        return str(exc)
+    except LocalRagError:
+        return (
+            "I could not query the local knowledge base. "
+            "Check that Ollama is running and the configured models are installed."
+        )
+
+    if not answer.sources:
+        return answer.text
+
+    sources = ", ".join(answer.sources)
+    return f"{answer.text}\n\nSources: {sources}"

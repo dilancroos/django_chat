@@ -1,11 +1,25 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
-from allauth.account.utils import send_email_confirmation
+from allauth.account.models import EmailAddress
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from django.contrib import messages
 from .forms import *
+
+
+def send_user_email_confirmation(request, user):
+    email_address = EmailAddress.objects.get_primary(user)
+    if email_address is None and user.email:
+        email_address = EmailAddress.objects.create(
+            user=user,
+            email=user.email,
+            primary=True,
+            verified=False,
+        )
+    if email_address is not None:
+        email_address.send_confirmation(request)
+
 
 def profile_view(request, username=None):
     if username:
@@ -64,7 +78,7 @@ def profile_emailchange(request):
             # Then Signal updates emailaddress and set verified to False
             
             # Then send confirmation email 
-            send_email_confirmation(request, request.user)
+            send_user_email_confirmation(request, request.user)
             
             return redirect('profile-settings')
         else:
@@ -76,7 +90,7 @@ def profile_emailchange(request):
 
 @login_required
 def profile_emailverify(request):
-    send_email_confirmation(request, request.user)
+    send_user_email_confirmation(request, request.user)
     return redirect('profile-settings')
 
 

@@ -1,0 +1,12 @@
+.env
+.venv/
+.DS_Store
+__pycache__/
+*.py[cod]
+db.sqlite3
+
+knowledge_base/*
+!knowledge_base/.gitkeep
+knowledge_markdown/*
+!knowledge_markdown/.gitkeep
+rag_storage/
